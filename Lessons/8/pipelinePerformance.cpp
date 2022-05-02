@@ -1,13 +1,18 @@
-#include <iostream>
 #include <mutex>
-#include <condition_variable>
 #include <deque>
 #include <vector>
 #include <chrono>
-#include <cstddef>
 #include <math.h>
 #include <string>
+#include <thread>
+#include <chrono>
+#include <cstddef>
+#include <iostream>
 #include <functional>
+#include <condition_variable>
+
+#define EOS -1
+using namespace std::chrono_literals;
 
 template <typename T>
 class myqueue
@@ -38,12 +43,6 @@ public:
   }
 };
 
-#define EOS -1
-
-#include <chrono>
-#include <thread>
-using namespace std::chrono_literals;
-
 void drain(myqueue<int> &q, std::chrono::milliseconds msecs) {
   std::cout << "Drain started" << std::endl;
   auto e = q.pop();
@@ -73,7 +72,7 @@ void genericstage(myqueue<int> &inq, myqueue<int> &outq, std::chrono::millisecon
   
   while(e != EOS) {
     std::this_thread::sleep_for(msecs);
-    auto res = e+1;
+    auto res = e+10;
     outq.push(res);
     e = inq.pop();
   }
@@ -81,16 +80,18 @@ void genericstage(myqueue<int> &inq, myqueue<int> &outq, std::chrono::millisecon
   return;
 }
 
-myqueue<int> source2one, one2drain;
+int main(int argc, char * argv[])
+{
+    myqueue<int> source2one, one2drain;
 
-std::thread s1(source, std::ref(source2one), 10, 1000ms);
+    std::thread s1(source, std::ref(source2one), 10, 1000ms);
+    auto inc = [](int x) { return(x+1);};
+    std::thread s2(genericstage, std::ref(source2one), std::ref(one2drain), 1000ms);
+    std::thread s3(drain, std::ref(one2drain), 1000ms);
 
-auto inc = [](int x) { return(x+1);};
+    s1.join();
+    s2.join();
+    s3.join();
 
-std::thread s2(genericstage, std::ref(source2one), std::ref(one2drain), 1000ms);
-
-std::thread s3(drain, std::ref(one2drain), 1000ms);
-
-s1.join();
-s2.join();
-s3.join();
+    return 0;
+}
