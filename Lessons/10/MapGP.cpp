@@ -95,4 +95,8 @@ int main(int argc, char * argv[]) {
       cout << r1[i] << " != " << r2[i] << " at " << i << endl;
 
   return(0);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 1104b8958552623f5491c64ca307e2df5ffb9e04

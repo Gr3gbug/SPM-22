@@ -1,0 +1,6 @@
+Lesson 10
+Using high level programming frameworks:
+	GrPPi (pipelines and farms). 
+	OpenMP pragma parallel for
+Compositions of patterns. 
+Data parallel map: recap of the thread based implementation (GrPPI version and OpenMP pragma parallel for)
